@@ -1,40 +1,69 @@
 import pygame, sys
 import pygame as pg
+import os
 import random
+
 pg.init()
 print("start")
+
 #windows
 screen_width = 800
 screen_height = 600
 screen = pg.display.set_mode((screen_width,screen_height))
 pg.display.set_caption("A Game")
 
-#to determine excelleration in Hero.move()
+#relative path to images
+dir = os.path.dirname(__file__)
+sticky = os.path.join(dir, 'images/stick.jpg')
+
+#to determine excelleration
+#!! not implemented
 def graph(x, deriv=False):
     if deriv==True:
         return 2*x
-    return x^2
+    return x**2
 
 class Hero:
 
     def __init__(self):
         self.x = 10
         self.y = 300
+
+        self.right = False
+        self.left = False
         self.xvel = 0
         self.yvel = 0
 
-        self.xvelmax = 20
-        self.xvelmin = -20
+        self.xvelmax = 10
+        self.xvelmin = -10
+        self.image = pg.image.load(sticky)
 
-        self.image = pg.image.load("C:/Users/Henning/Desktop/Programme/Python/A Game/images/stick.png")
-
-
-    def move(x, y):
-        #input
-        self.xvel += x
-        self.yvel += y
-        print(self.xvel)
     def update(self):
+        #movement input
+        #!! -Feature: hält man Right gedrückt und dann Left+Right gedrückt wird der
+        #!!           neue Input (Left) akeptiert (man dreht sich)
+        if self.right:
+            self.xvel += 1
+
+        if self.left:
+            self.xvel -= 1
+
+        #friction on X Axcis
+        if not self.left and not self.right and self.yvel == 0:
+            #!! möglicherweise eine Funktion einbauen, damit das Movement
+            #!! natürlicher wird
+            if self.xvel > 0:
+                self.xvel += -1
+            elif self.xvel < 0:
+                self.xvel += 1
+
+        #speedcap
+        if self.xvel > self.xvelmax:
+            self.xvel=self.xvelmax
+        elif self.xvel < self.xvelmin:
+            self.xvel=self.xvelmin
+
+        #updateing coordinates
         self.x += self.xvel
         self.y += self.yvel
 
@@ -56,26 +85,27 @@ class Game:
         run = True
         pg.event.get()
 
+        #main loop
         while run == True:
             clock.tick(self.framerate)
 
             #input
-            for event in pg.event.get():
+            events = list(pg.event.get())
+            for event in events:
                 if event.type == pg.QUIT:
                     run = False
 
                 if event.type == pg.KEYDOWN:
-                    if event.type == pg.K_LEFT:
-                        player.move(-1,0)
-                    if event.type == pg.K_RIGHT:
-                        player.move(1,0)
+                    if event.key == pg.K_LEFT:
+                        Player.left = True
+                    if event.key == pg.K_RIGHT:
+                        Player.right = True
 
-                #if event.type == pg.KEYUP:
-                #    if event.type == pg.K_Left:
-
-                #    if event.type == pg.K_Left:
-
-            #draw
+                if event.type == pg.KEYUP:
+                    if event.key == pg.K_LEFT:
+                        Player.left = False
+                    if event.key == pg.K_RIGHT:
+                        Player.right = False
 
             #background
             screen.fill((255,255,255))
@@ -87,10 +117,6 @@ class Game:
             pg.display.update()
 
 
-
-
-
-
 game = Game()
 game.execute()
 
@@ -99,4 +125,4 @@ game.execute()
 
 pg.quit()
 quit()
-print("fin")
+print("end")
