@@ -1,4 +1,4 @@
-import pygame, sys
+import sys
 import pygame as pg
 import os
 import random
@@ -23,9 +23,12 @@ def graph(x, deriv=False):
         return 2*x
     return x**2
 
-class Hero:
+class Hero(pg.sprite.Sprite):
 
     def __init__(self):
+        self.image = pg.image.load(sticky)
+
+
         self.x = 10
         self.y = 300
 
@@ -33,15 +36,14 @@ class Hero:
         self.left = False
         self.xvel = 0
         self.yvel = 0
-
         self.xvelmax = 10
         self.xvelmin = -10
-        self.image = pg.image.load(sticky)
 
     def update(self):
         #movement input
         #!! -Feature: hält man Right gedrückt und dann Left+Right gedrückt wird der
         #!!           neue Input (Left) akeptiert (man dreht sich)
+        #!!           erlaubt schnelle Rektionen (Keine "Blockade")
         if self.right:
             self.xvel += 1
 
@@ -112,6 +114,7 @@ class Game:
 
             #sprites
             Player.update()
+
             Player.show()
 
             pg.display.update()
