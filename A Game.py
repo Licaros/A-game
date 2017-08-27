@@ -1,7 +1,11 @@
-import sys
 import pygame as pg
-import os
+from os import path
 import random
+
+import Character
+import Terrain
+
+
 
 pg.init()
 print("start")
@@ -13,8 +17,9 @@ screen = pg.display.set_mode((screen_width,screen_height))
 pg.display.set_caption("A Game")
 
 #relative path to images
-dir = os.path.dirname(__file__)
-sticky = os.path.join(dir, 'images/stick.jpg')
+dir = path.dirname(__file__)
+sticky = path.join(dir, 'images/stick.jpg')
+testground = path.join(dir, 'images/ground.jpg')
 
 #to determine excelleration
 #!! not implemented
@@ -23,56 +28,15 @@ def graph(x, deriv=False):
         return 2*x
     return x**2
 
-class Hero(pg.sprite.Sprite):
+#sprite groups
+s_player = pg.sprite.Group()
+s_enemy  = pg.sprite.Group()
+s_solid  = pg.sprite.Group()
 
-    def __init__(self):
-        self.image = pg.image.load(sticky)
 
 
-        self.x = 10
-        self.y = 300
-
-        self.right = False
-        self.left = False
-        self.xvel = 0
-        self.yvel = 0
-        self.xvelmax = 10
-        self.xvelmin = -10
-
-    def update(self):
-        #movement input
-        #!! -Feature: hält man Right gedrückt und dann Left+Right gedrückt wird der
-        #!!           neue Input (Left) akeptiert (man dreht sich)
-        #!!           erlaubt schnelle Rektionen (Keine "Blockade")
-        if self.right:
-            self.xvel += 1
-
-        if self.left:
-            self.xvel -= 1
-
-        #friction on X Axcis
-        if not self.left and not self.right and self.yvel == 0:
-            #!! möglicherweise eine Funktion einbauen, damit das Movement
-            #!! natürlicher wird
-            if self.xvel > 0:
-                self.xvel += -1
-            elif self.xvel < 0:
-                self.xvel += 1
-
-        #speedcap
-        if self.xvel > self.xvelmax:
-            self.xvel=self.xvelmax
-        elif self.xvel < self.xvelmin:
-            self.xvel=self.xvelmin
-
-        #updateing coordinates
-        self.x += self.xvel
-        self.y += self.yvel
-
-    def show(self):
-        screen.blit(self.image,(self.x,self.y))
-
-Player = Hero()
+g = Terrain.Ground(testground, s_solid)
+Player = Character.Hero(sticky, s_player)
 
 class Game:
 
@@ -80,7 +44,6 @@ class Game:
         scl=10
         pg.init()
         self.framerate = 30
-
 
     def execute(self):
         clock = pg.time.Clock()
@@ -90,38 +53,31 @@ class Game:
         #main loop
         while run == True:
             clock.tick(self.framerate)
-
             #input
-            events = list(pg.event.get())
-            for event in events:
+            for event in pg.event.get():
                 if event.type == pg.QUIT:
                     run = False
+            Player.move()
 
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_LEFT:
-                        Player.left = True
-                    if event.key == pg.K_RIGHT:
-                        Player.right = True
+            Player.colission(g)
 
-                if event.type == pg.KEYUP:
-                    if event.key == pg.K_LEFT:
-                        Player.left = False
-                    if event.key == pg.K_RIGHT:
-                        Player.right = False
+            #pg.sprite.spritecollideany(s_player, s_solid)
 
             #background
-            screen.fill((255,255,255))
-
-            #sprites
-            Player.update()
-
-            Player.show()
-
+            screen.fill((105,105,105))
+            Player.show(screen)
+            g.show(screen)
             pg.display.update()
-
-
 game = Game()
+
+
+
+
+
+
 game.execute()
+
+
 
 
 
