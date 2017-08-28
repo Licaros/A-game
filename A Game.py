@@ -50,6 +50,10 @@ class Game:
 
         #deathzone
         if self.Player.pos.y > HEIGHT+40:
+            self.Player.energy = 0
+
+        #die if energy = 0
+        if self.Player.energy <= 0:
             print("dead")
             pg.quit()
             quit()
@@ -88,6 +92,7 @@ class Game:
             self.events()
             self.update()
             self.draw()
+
 
 
 game = Game()

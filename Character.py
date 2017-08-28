@@ -16,6 +16,7 @@ class Hero(pg.sprite.Sprite):
         self.vel = vec(0, 0)
         self.direction = 0
         self.stand = False
+        self.energy = 100
     def update(self):
         self.acc = vec(0, 0)
 
