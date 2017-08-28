@@ -10,6 +10,7 @@ class Hero(pg.sprite.Sprite):
         self.image = pg.image.load(image).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.midbottom = (x, y)
+        s_alive.add(self)
         s_player.add(self)
         s_all.add(self)
         self.pos = vec(x, y)

@@ -5,6 +5,7 @@ import random
 from Globals import *
 from Terrain import *
 from Character import *
+from Enemy1 import *
 
 
 pg.init()
@@ -13,6 +14,7 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 dir = path.dirname(__file__)
 sticky = path.join(dir, 'images/stick.jpg')
 testground = path.join(dir, 'images/ground.jpg')
+enemy = path.join(dir, 'images/enemy1.png')
 
 #to determine excelleration
 #!! not implemented
@@ -32,6 +34,7 @@ class Game:
         self.Ground = Platform(0, HEIGHT-100, 100, 20)
         self.Plat1 = Platform(500, HEIGHT-150, 100, 20)
         self.Plat2 = Platform(0, HEIGHT-10, 1000, 20)
+        self.enemy = Enemy(200, 100, enemy)
     #Gameloop functions
     def events(self):
         for event in pg.event.get():
@@ -42,11 +45,17 @@ class Game:
     def update(self):
         self.Player.update()
         #colissiona
-        touch = pg.sprite.spritecollide(self.Player, s_solid, False)
-        if touch:
-            self.Player.pos.y = touch[0].rect.y + 1
-            self.Player.vel.y = 0
-            self.Player.stand = True
+        for obj in s_alive:
+            touch = pg.sprite.spritecollide(obj, s_solid, False)
+            if touch:
+                obj.pos.y = touch[0].rect.y + 1
+                obj.vel.y = 0
+                obj.dstand = True
+
+
+        enemyattack = pg.sprite.spritecollide(self.Player, s_enemy, False)
+        if enemyattack:
+                self.Player.energy = 0
 
         #deathzone
         if self.Player.pos.y > HEIGHT+40:

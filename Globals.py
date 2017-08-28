@@ -17,6 +17,7 @@ s_enemy  = pg.sprite.Group()
 s_solid  = pg.sprite.Group()
 s_trigger = pg.sprite.Group()
 s_all    = pg.sprite.Group()
+s_alive = pg.sprite.Group()
 
 
 def gravity(vel):
