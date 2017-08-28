@@ -1,16 +1,25 @@
 import pygame as pg
+from Globals import *
 
+class Platform(pg.sprite.Sprite):
+    def __init__(self, x, y, length, height):
+        super(Platform, self).__init__()
+        self.y = y
+        self.image = pg.Surface((height,length))
+        self.image.fill((0,255,0))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        s_solid.add(self)
+        s_all.add(self)
+        self.pos = self.rect.midbottom
 
-class Ground(pg.sprite.Sprite):
-
-    def __init__(self, image, s_group):
-        #pg.sprite.Sprite.__init__(self, s_group)
-        super(Ground, self).__init__()
-        self.x = 0
-        self.y = 580
-        self.image = pg.image.load(image).convert_alpha()
-        self.rect = pg.Rect((self.x,self.y),(-10,800))
-        s_group.add(self)
+class Spike(pg.sprite.Sprite):
+    def __init__(self, x, y, image):
+        super(Spike, self).__init__()
+        self.x = x
+        self.y = y
+        self.image  = pg.image.load(image).convert_alpha()
+        self.rect = pg.Rect((self.x,self.y),(10,10))
 
     def show(self, screen):
         screen.blit(self.image,(self.x,self.y))
