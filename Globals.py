@@ -20,5 +20,5 @@ s_all    = pg.sprite.Group()
 
 
 def gravity(vel):
-    # deriv of 0.01*x² + 0.0001
+    # deriv of 0.01*x² + 0.1*x
     return 0.02*abs(vel) + 0.1

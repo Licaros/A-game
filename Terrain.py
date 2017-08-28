@@ -4,14 +4,13 @@ from Globals import *
 class Platform(pg.sprite.Sprite):
     def __init__(self, x, y, length, height):
         super(Platform, self).__init__()
-        self.y = y
-        self.image = pg.Surface((height,length))
+        self.image = pg.Surface((length,height))
         self.image.fill((0,255,0))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         s_solid.add(self)
         s_all.add(self)
-        self.pos = self.rect.midbottom
+        self.pos = self.rect.midtop
 
 class Spike(pg.sprite.Sprite):
     def __init__(self, x, y, image):
