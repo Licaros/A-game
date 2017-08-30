@@ -18,15 +18,19 @@ class Enemy(pg.sprite.Sprite):
         self.direction = 0
         self.stand = False
         self.energy = 100
+        self.damage = -100
     def update(self):
         self.acc = vec(0, 0)
 
         self.vel.x += self.acc.x
         self.vel.x = self.vel.x * PLAYER_FRICTION
         #gravity
-        self.acc.y = gravity(self.vel.y)
-        self.vel.y += self.acc.y
+        if not self.stand:
+            self.acc.y = gravity(self.vel.y)
+            self.vel.y += self.acc.y
         #position update
         self.pos.x += self.vel.x + self.acc.x * 0.5
         self.pos.y += self.vel.y
         self.rect.midbottom = self.pos
+    def attack(self, target):
+        target.energy += self.damage

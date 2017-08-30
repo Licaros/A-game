@@ -29,12 +29,26 @@ class Game:
     def __init__(self):
         pg.init()
 
-    def new(self): #level etc.
+    def new(self, level):
+        #in process
         self.Player = Hero(400, 100, sticky)
-        self.Ground = Platform(0, HEIGHT-100, 100, 20)
-        self.Plat1 = Platform(500, HEIGHT-150, 100, 20)
-        self.Plat2 = Platform(0, HEIGHT-10, 1000, 20)
-        self.enemy = Enemy(200, 100, enemy)
+        lvl = open(level, "r")
+        characters = len(lvl.readline(1))
+        for y in lvl:
+            for x in range(0,characters):
+                if x == 1:
+                    Platform(y*scale, x*scale)
+
+        Platform(200,400)
+        Platform(220,400)
+        Platform(240,400)
+        Platform(260,400)
+        Platform(290,400)
+        Platform(310,400)
+        Platform(330,400)
+        Platform(350,400)
+        Platform(370,400)
+        Platform(400,110)
     #Gameloop functions
     def events(self):
         for event in pg.event.get():
@@ -44,48 +58,21 @@ class Game:
                 quit()
     def update(self):
         self.Player.update()
-        #colissiona
-        for obj in s_alive:
-            touch = pg.sprite.spritecollide(obj, s_solid, False)
-            if touch:
-                obj.pos.y = touch[0].rect.y + 1
-                obj.vel.y = 0
-                obj.dstand = True
+        #colissions with enemys
+        touch = pg.sprite.spritecollide(self.Player, s_enemy, False)
+        if touch:
+            touch[0].attack(self.Player)
 
-
-        enemyattack = pg.sprite.spritecollide(self.Player, s_enemy, False)
-        if enemyattack:
-                self.Player.energy = 0
-
-        #deathzone
+        #deathzoneaa
         if self.Player.pos.y > HEIGHT+40:
-            self.Player.energy = 0
-
-        #die if energy = 0
-        if self.Player.energy <= 0:
             print("dead")
+            self.Player.energy = 0
             pg.quit()
             quit()
 
-        #screen scrollingddd
-        xcorrecture = -(self.Player.vel.x + self.Player.acc.x * 0.5)
-        ycorrecture = -(self.Player.vel.y + self.Player.acc.y * 0.5)
-        if self.Player.pos.x > WIDTH - 200:
-            self.Player.pos.x = WIDTH - 200
-            for i in s_solid:
-                i.rect.x += xcorrecture
-        elif self.Player.pos.x < 200:
-            self.Player.pos.x = 200
-            for i in s_solid:
-                i.rect.x += xcorrecture
-        if self.Player.pos.y < 200:
-            self.Player.pos.y = 200
-            for i in s_solid:
-                i.rect.y += ycorrecture
-        elif self.Player.pos.y > HEIGHT - 200:
-            self.Player.pos.y = HEIGHT - 200
-            for i in s_solid:
-                i.rect.y += ycorrecture
+        #screen scrolling
+        #!!!NEEDS UPDATE (MAP; CAMERA)
+
         s_all.update()
     def draw(self):
         screen.fill((80,70,160))
@@ -105,7 +92,7 @@ class Game:
 
 
 game = Game()
-game.new()
+game.new(path.join(dir,"maps/test1.txt"))
 game.execute()
 
 
