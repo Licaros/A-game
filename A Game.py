@@ -31,24 +31,17 @@ class Game:
 
     def new(self, level):
         #in process
-        self.Player = Hero(400, 100, sticky)
         lvl = open(level, "r")
-        characters = len(lvl.readline(1))
-        for y in lvl:
-            for x in range(0,characters):
-                if x == 1:
-                    Platform(y*scale, x*scale)
+        characters = len(lvl.readline())-1
+        y = 0
+        for i in lvl:
+            y += 1
+            for j in range(0,characters):
+                if i[j] == "P":
+                    self.Player = Hero(j*scale, y*scale, sticky)
+                elif i[j] == "1":
+                    Platform(j*scale, y*scale)
 
-        Platform(200,400)
-        Platform(220,400)
-        Platform(240,400)
-        Platform(260,400)
-        Platform(290,400)
-        Platform(310,400)
-        Platform(330,400)
-        Platform(350,400)
-        Platform(370,400)
-        Platform(400,110)
     #Gameloop functions
     def events(self):
         for event in pg.event.get():

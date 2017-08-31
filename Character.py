@@ -6,15 +6,11 @@ vec = pg.math.Vector2
 def collide_solid(subj):
     touch = pg.sprite.spritecollide(subj, s_solid, False)
     if touch:
-        subj.pos.y = touch[0].rect.y -10
+        subj.pos.y = touch[0].rect.y -9.01
         subj.vel.y = 0
         subj.stand = True
     else:
         subj.stand = False
-
-    subj.pos.x += subj.vel.x + subj.acc.x * 0.5
-    subj.pos.y += subj.vel.y
-    subj.rect.center = subj.pos
 
 class Hero(pg.sprite.Sprite):
 

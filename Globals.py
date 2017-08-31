@@ -7,7 +7,7 @@ pg.display.set_caption("A Game")
 framerate = 60
 scale = 20
 #sprite Constants
-PLAYER_FRICTION = 0.8
+PLAYER_FRICTION = 0.85
 
 
 
