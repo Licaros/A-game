@@ -23,7 +23,7 @@ def graph(x, deriv=False):
         return 2*x
     return x**2
 
-#__main()__a
+#__main()__
 class Game:
 
     def __init__(self):
@@ -42,7 +42,6 @@ class Game:
                 elif i[j] == "1":
                     Platform(j*scale, y*scale)
 
-    #Gameloop functions
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -57,7 +56,7 @@ class Game:
             touch[0].attack(self.Player)
 
         #deathzoneaa
-        if self.Player.pos.y > HEIGHT+40:
+        if self.Player.rect.y > HEIGHT+40:
             print("dead")
             self.Player.energy = 0
             pg.quit()
@@ -71,7 +70,6 @@ class Game:
         screen.fill((80,70,160))
         s_all.draw(screen)
         pg.display.update()
-
     def execute(self):
         clock = pg.time.Clock()
         run = True
@@ -81,7 +79,6 @@ class Game:
             self.events()
             self.update()
             self.draw()
-
 
 
 game = Game()
