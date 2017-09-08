@@ -12,16 +12,9 @@ pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 #relative path to images
 dir = path.dirname(__file__)
-sticky = path.join(dir, 'images/stick.jpg')
+sticky = path.join(dir, 'images/Ninja.png')
 testground = path.join(dir, 'images/ground.jpg')
 enemy = path.join(dir, 'images/enemy1.png')
-
-#to determine excelleration
-#!! not implemented
-def graph(x, deriv=False):
-    if deriv==True:
-        return 2*x
-    return x**2
 
 #__main()__
 class Game:
@@ -48,6 +41,7 @@ class Game:
                 run = False
                 pg.quit()
                 quit()
+
     def update(self):
         self.Player.update()
         #colissions with enemys
@@ -66,16 +60,22 @@ class Game:
         #!!!NEEDS UPDATE (MAP; CAMERA)
 
         s_all.update()
+
     def draw(self):
         screen.fill((80,70,160))
+
         s_all.draw(screen)
+        screen.blit(self.label, (10, 10))
+
         pg.display.update()
+
     def execute(self):
         clock = pg.time.Clock()
         run = True
         #main loop
         while run == True:
             clock.tick(framerate)
+            self.label = font.render("fps: " + str(clock.get_fps()), True, (255,0,0))
             self.events()
             self.update()
             self.draw()

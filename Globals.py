@@ -1,11 +1,13 @@
 import pygame as pg
-
+pg.init()
+pg.font.init
 #settings
 WIDTH = 800
 HEIGHT = 600
 pg.display.set_caption("A Game")
 framerate = 60
 scale = 20
+font = pg.font.SysFont("Arial", 15)
 #sprite Constants
 PLAYER_FRICTION = 0.85
 

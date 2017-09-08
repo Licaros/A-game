@@ -39,31 +39,29 @@ class Hero(pg.sprite.Sprite):
         self.direction = 0
         self.stand = False
         self.energy = 100
+        self.speed = 0.4
+        self.jumpheight = -6
         self.friction = 0.9 #speed cap
     def update(self):
         self.acc = vec(0, 0)
-
+        #keyboard input
         key = pg.key.get_pressed()
         if key[pg.K_a] and key[pg.K_d]:
             if self.direction == -1:
-                self.acc.x += 0.5
+                self.acc.x += self.speed
             if self.direction == 1:
-                self.acc.x += -0.5
+                self.acc.x += -self.speed
         elif key[pg.K_a]:
             self.direction = -1
-            self.acc.x += -0.5
+            self.acc.x += -self.speed
         elif key[pg.K_d]:
             self.direction = 1
-            self.acc.x += 0.5
-        #slowdown
-        #elif self.acc.x > 0:
-        #    self.direction = -1
-        else:
-            self.acc.x = 0
-        if key[pg.K_w] and self.stand:
-            self.vel.y = -7 #jump velocity
+            self.acc.x += self.speed
 
-        self.vel.x = (self.vel.x + self.acc.x) * PLAYER_FRICTION
+        if key[pg.K_w] and self.stand:
+            self.vel.y = self.jumpheight
+
+        self.vel.x = (self.vel.x + self.acc.x) * self.friction
         #gravity
         self.acc.y = gravity(self.vel.y)
         self.vel.y += self.acc.y
