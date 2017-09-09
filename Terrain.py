@@ -4,7 +4,7 @@ from Globals import *
 class Platform(pg.sprite.Sprite):
 
     def __init__(self, x, y):
-        super(Platform, self).__init__()
+        pg.sprite.Sprite.__init__(self)
         self.image = pg.Surface((scale,scale))
         self.image.fill((0,255,0))
         self.rect = self.image.get_rect()

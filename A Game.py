@@ -12,10 +12,8 @@ pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 #relative path to images
 dir = path.dirname(__file__)
-sticky = path.join(dir, 'images/Ninja.png')
-testground = path.join(dir, 'images/ground.jpg')
-enemy = path.join(dir, 'images/enemy1.png')
 
+img_player = path.join(dir, 'images/Walker.png')
 #__main()__
 class Game:
 
@@ -31,7 +29,7 @@ class Game:
             y += 1
             for j in range(0,characters):
                 if i[j] == "P":
-                    self.Player = Hero(j*scale, y*scale, sticky)
+                    self.Player = Hero(j*scale, y*scale, img_player)
                 elif i[j] == "1":
                     Platform(j*scale, y*scale)
 
@@ -62,11 +60,12 @@ class Game:
         s_all.update()
 
     def draw(self):
-        screen.fill((80,70,160))
+        screen.fill((200,200,200))
 
         s_all.draw(screen)
         screen.blit(self.label, (10, 10))
-
+        screen.blit(self.speedmeter, (10, 25))
+        screen.blit(self.accel, (10, 40))
         pg.display.update()
 
     def execute(self):
@@ -75,7 +74,15 @@ class Game:
         #main loop
         while run == True:
             clock.tick(framerate)
-            self.label = font.render("fps: " + str(clock.get_fps()), True, (255,0,0))
+            try:
+                tack += 1
+            except:
+                tack = 20
+            if tack == 20:
+                tack= 0
+                self.label = font.render("fps: " + str(clock.get_fps()), True, (255,0,0))
+                self.speedmeter = font.render("Speed: " + str(self.Player.vel.x), True, (255, 0, 0))
+                self.accel = font.render("Acceleration: " + str(self.Player.acc.x), True, (255, 0, 0))
             self.events()
             self.update()
             self.draw()

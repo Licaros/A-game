@@ -8,8 +8,7 @@ pg.display.set_caption("A Game")
 framerate = 60
 scale = 20
 font = pg.font.SysFont("Arial", 15)
-#sprite Constants
-PLAYER_FRICTION = 0.85
+
 
 
 
@@ -25,3 +24,13 @@ s_alive = pg.sprite.Group()
 def gravity(vel):
     # deriv of 0.01*x² + 0.1*x
     return 0.025*abs(vel) + 0.1
+
+def slice_spritesheet(sheet, w, h):
+    images = []
+    master = pg.image.load(sheet).convert_alpha()
+    masterw, masterh = master.get_size()
+
+    for i in range(int(masterw / w)):
+        images.append(master.subsurface((i*w, 0, w, h)))
+
+    return images
