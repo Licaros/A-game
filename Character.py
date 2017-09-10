@@ -3,35 +3,15 @@ from Globals import *
 
 vec = pg.math.Vector2
 
-def collide_solid(subj):
-    subj.stand = False
-    w = subj.rect.width
-    h = subj.rect.height
-    subj.rect.x += (subj.vel.x + subj.acc.x) * subj.friction
-    touch = pg.sprite.spritecollide(subj, s_solid, False)
-    if touch:
-        if subj.vel.x > 0:
-            subj.rect.x = touch[0].rect.left - w
-        elif subj.vel.x < 0:
-            subj.rect.x = touch[0].rect.right
-        subj.vel.x = 0
-    subj.rect.y += subj.vel.y
-    touch = pg.sprite.spritecollide(subj, s_solid, False)
-    if touch:
-        if subj.vel.y > 0:
-            subj.rect.y = touch[0].rect.top - h
-            subj.stand = True
-        elif subj.vel.y < 0:
-            subj.rect.y = touch[0].rect.bottom
-        subj.vel.y = 0
 
 class Hero(pg.sprite.Sprite):
 
-    def __init__(self, x, y, image):
+    def __init__(self, x, y, spritesheet):
         pg.sprite.Sprite.__init__(self)
-        self.images = slice_spritesheet(image, 20*4, 20*4 )
+        self.images = slice_spritesheet(spritesheet, 10*4, 17*4 )
         self.image = self.images[0]
         self.rect = self.image.get_rect()
+        self.rect.midbottom = (x,y)
 
         s_alive.add(self)
         s_player.add(self)
@@ -40,35 +20,100 @@ class Hero(pg.sprite.Sprite):
         self.vel = vec(0, 0)
         self.direction = 1
         self.stand = False
+        self.attack = False
 
         self.energy = 100
+        self.damage = -10
         self.speed = 0.4
         self.jumpheight = -6
         self.friction = 0.85 #speed cap
         self.acc = vec(0,0)
+
         self.anim_tick = 0
         self.anim_index = 0
+        self.anim_direction = 1
+
+    def move(self, direction, oneInput=True):
+        if oneInput:
+            self.anim_direction = direction
+        self.direction = direction
+        self.acc.x += self.speed * direction
+
+    def jump(self):
+        if not self.stand:
+            return
+
+        self.vel.y = self.jumpheight
+
+    def doAttack(self):
+        att_range = 30
+        sensor = pg.Rect(self.rect.center[0]+att_range*self.direction, self.rect.center[1]-5, 5, 10)
+        for target in s_enemy:
+            if sensor.colliderect(target.rect)==1:
+                target.onHit(self.damage, self.direction)
+        #screen.blit(sensor)
+        self.anim_tick = 100
+
+    def onHit(self, dmg, direction):
+        pass
+
+    #animations
+    def Anim_Stand(self):
+        self.anim_index = 0
+        self.anim_tick = 0
+        newImage(self) #sollte nur updaten wenn event=keyup
+    def Anim_Walk(self):
+        if self.anim_tick < 10: #animation speed
+            return
+        self.anim_index += 1
+        if self.anim_index == 7:
+            self.anim_index = 1
+        self.anim_tick = 0
+        newImage(self)
+    def Anim_Punch(self):
+        if self.anim_tick < 30: #animation speed
+            return
+
+        if self.anim_index < 8: #start animation
+            self.anim_index = 8
+        else:
+            self.anim_index += 1
+        if self.anim_index == 16:
+            self.doAttack()
+            self.attack = False
+        if self.anim_index > 15:
+            self.anim_index = 0
+        self.anim_tick = 0
+
+        newImage(self)
 
     def update(self):
-        self.acc = vec(0, 0)
+        self.acc = vec(0,0)
         #keyboard input
         key = pg.key.get_pressed()
-        if key[pg.K_a] and key[pg.K_d]:
+        if key[pg.K_LEFT] and key[pg.K_RIGHT]:
             if self.direction == -1:
-                self.acc.x += self.speed
+                self.move(-1, False)
             if self.direction == 1:
-                self.acc.x += -self.speed
-        elif key[pg.K_a]:
+                self.move(1, False)
+        elif key[pg.K_LEFT]:
             self.move(-1)
-        elif key[pg.K_d]:
+        elif key[pg.K_RIGHT]:
             self.move(1)
-        self.vel.x = (self.vel.x + self.acc.x) * self.friction
-        if key[pg.K_w]:
+        if key[pg.K_UP]:
             self.jump()
+        if key[pg.K_q]:
+            self.attack = True
 
+        if self.attack:
+            self.acc.x = 0
+        self.vel.x = (self.vel.x + self.acc.x) * self.friction
         #gravity
         self.acc.y = gravity(self.vel.y)
         self.vel.y += self.acc.y
+
+        if self.attack and self.stand:
+            self.vel.x = 0
 
         #rounding
         self.vel.y = round(self.vel.y, 4)
@@ -79,33 +124,11 @@ class Hero(pg.sprite.Sprite):
         #colissions and moving
         collide_solid(self)
 
-        self.animate()
-
-    def move(self, direction):
-        self.direction = direction
-        self.acc.x += self.speed * direction
-
-    def jump(self):
-        if not self.stand:
-            return
-
-        self.vel.y = self.jumpheight
-
-    def animate(self):
-        self.anim_tick += 1
-        if self.anim_tick == 10:
-
-            if self.vel.x != 0:
-                self.anim_index += 1
-                if self.anim_index == len(self.images):
-                    self.anim_index = 1
-            else:
-                self.anim_index = 0
-
-            self.anim_tick = 0
-
-            image = self.images[self.anim_index]
-            if self.direction == 1:
-                self.image = image
-            elif self.direction == -1:
-                self.image = pg.transform.flip(image, True, False)
+        #animation:
+        if self.attack:
+            self.Anim_Punch()
+        elif self.acc.x != 0:
+            self.Anim_Walk()
+        else:
+            self.Anim_Stand()
+        self.anim_tick+=1
