@@ -28,7 +28,7 @@ class Race(pg.sprite.Sprite):
         global timerstart
         global timer
         if self.fin and pg.sprite.spritecollide(self, s_player, False) and timer > 2:
-            print("Fin: " + str(timer))
+            ("Fin: " + str(timer))
 
             timer = 0
         elif not self.fin and pg.sprite.spritecollide(self, s_player, False):

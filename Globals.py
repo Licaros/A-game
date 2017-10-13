@@ -5,18 +5,20 @@ pg.font.init
 WIDTH = 1366
 HEIGHT = 768
 pg.display.set_caption("A Game")
-framerate = 60
+framerate = 70
 scale = 20
 font = pg.font.SysFont("Arial", 15)
 timer = 0
 timerstart = False
+airfriction = 0.8
 #sprite groups
-s_player = pg.sprite.Group()
-s_enemy  = pg.sprite.Group()
-s_solid  = pg.sprite.Group()
+boxes = []
+s_player  = pg.sprite.Group()
+s_enemy   = pg.sprite.Group()
+s_solid   = pg.sprite.Group()
 s_trigger = pg.sprite.Group()
-s_all    = pg.sprite.Group()
-s_alive = pg.sprite.Group()
+s_all     = pg.sprite.Group()
+s_alive   = pg.sprite.Group()
 
 def slice_spritesheet(sheet, w, h):
     images = []
@@ -30,7 +32,7 @@ def slice_spritesheet(sheet, w, h):
 
 def gravity(vel):
     # deriv of 0.01*x² + 0.1*x
-    return 0.025*abs(vel) + 0.1
+    return (0.05*abs(vel) + 0.3 )* airfriction
 
 def newImage(subj): #for animation
     image = subj.images[subj.anim_index]
@@ -42,23 +44,27 @@ def newImage(subj): #for animation
 
 def collide_solid(subj):
     subj.stand = False
-    w = subj.rect.width
-    h = subj.rect.height
 
-    subj.rect.x += (subj.vel.x + subj.acc.x) * subj.friction
+    subj.vel.y = round(subj.vel.y, 4)
+    subj.vel.x = round(subj.vel.x, 4)
+    subj.rect.x += subj.vel.x + 0.5* subj.friction
     touch = pg.sprite.spritecollide(subj, s_solid, False)
+    subj.wall=False
     if touch:
+        subj.wall=True
         if subj.vel.x > 0:
-            subj.rect.x = touch[0].rect.left - w
+            subj.rect.right = touch[0].rect.left
         elif subj.vel.x < 0:
-            subj.rect.x = touch[0].rect.right
+            subj.rect.left = touch[0].rect.right
         subj.vel.x = 0
     subj.rect.y += subj.vel.y
     touch = pg.sprite.spritecollide(subj, s_solid, False)
     if touch:
         if subj.vel.y > 0:
-            subj.rect.y = touch[0].rect.top - h
+            subj.rect.bottom = touch[0].rect.top
             subj.stand = True
         elif subj.vel.y < 0:
-            subj.rect.y = touch[0].rect.bottom
+            subj.rect.top = touch[0].rect.bottom
         subj.vel.y = 0
+def distance(a, b):
+    return abs(a.rect.x - b.rect.x)

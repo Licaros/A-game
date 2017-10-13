@@ -5,7 +5,8 @@ import random
 from Globals import *
 from Terrain import *
 from Character import *
-from Enemy import *
+from Strawman import *
+from Knight import *
 
 
 pg.init()
@@ -15,6 +16,7 @@ dir = path.dirname(__file__)
 
 img_player = path.join(dir, 'images\walker.png')
 img_strawman = path.join(dir, 'images\strawman.png')
+img_knight = path.join(dir, 'images\knight.png')
 #__main()__
 class Game:
 
@@ -22,7 +24,6 @@ class Game:
         pg.init()
 
     def new(self, level):
-        #in process
         lvl = open(level, "r")
         characters = len(lvl.readline())-1
         y = 0
@@ -39,6 +40,9 @@ class Game:
                     Race(j*scale, y*scale)
                 elif i[j] == "B":
                     Race(j*scale, y*scale, True)
+                elif i[j] == "K":
+                    Knight(j*scale, y*scale, img_knight)
+        self.camera = Camera(WIDTH, HEIGHT)
 
     def events(self):
         for event in pg.event.get():
@@ -53,29 +57,32 @@ class Game:
 
 
     def update(self):
-        for sprite in s_alive:
-            sprite.update()
-        for sprite in s_solid:
-            try:
-                sprite.update()
-            except:
-                pass
-
-        #deathzone
-        if self.Player.rect.y > HEIGHT+40:
+        if self.Player.rect.y > HEIGHT+1000: #deathzone
             print("dead")
             self.Player.energy = 0
             pg.quit()
             quit()
 
         s_all.update()
+        self.camera.update(self.Player)
 
     def draw(self):
         screen.fill((00,00,00))
 
-        s_solid.draw(screen)
-        s_enemy.draw(screen)
-        s_player.draw(screen)
+        for sprite in s_all:
+            screen.blit(sprite.image, self.camera.apply(sprite))
+
+        #hitboxes
+        for sprite in s_alive:
+            drawrect = self.camera.applyr(sprite.rect)
+            pg.draw.rect(screen, (255,0,0), drawrect, 2)
+        for sprite in s_alive:
+            try:
+                drawrect = self.camera.applyr(sprite.sensor)
+                pg.draw.rect(screen, (255,255,0), drawrect,2)
+            except:
+                1+1
+        #pg.draw.rect(screen, (255,0,0), [100,100,100,100], 2)
         screen.blit(self.label, (10, 10))
         screen.blit(self.speedmeter, (10, 25))
         screen.blit(self.accel, (10, 40))
@@ -100,15 +107,41 @@ class Game:
             self.update()
             self.draw()
 
+class Map:
+
+    def __init__(level):
+        self.dict = "{01: Hero(), 02: Knight()}"
+
+
+
+class Camera:
+
+    def __init__(self, width, height):
+        self.rect = pg.Rect(0,0,width,height)
+        self.width = width
+        self.height = height
+
+    def apply(self, target):
+        return target.rect.move(self.rect.topleft)
+
+    def applyr(self, rec):
+        return rec.move(self.rect.topleft)
+
+    def update(self, target):
+        x = self.rect.x
+        y = self.rect.y
+        tx = target.rect.x
+        ty = target.rect.y
+
+        x = (self.width/2) - target.rect.x
+        y = (self.height/2) - target.rect.y
+        self.rect = pg.Rect(x,y,self.width,self.height)
 
 game = Game()
 game.new(path.join(dir,"maps/test1.txt"))
 
 #main
-while 1:
-    game.execute()
-
-
+game.execute()
 
 pg.quit()
 quit()
